@@ -1,0 +1,28 @@
+#!/bin/bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+HOOK="$ROOT/build/libxenomit_flash_hook.so"
+ELECTRON="$ROOT/browser/node_modules/electron/dist/electron"
+if [[ ! -f "$HOOK" ]]; then
+  echo "[xenomit-flash] hook library is missing. Run scripts/build.sh" >&2
+  exit 2
+fi
+if [[ ! -x "$ELECTRON" ]]; then
+  echo "[xenomit-flash] Electron 11 is missing. From browser/, run pnpm install" >&2
+  exit 2
+fi
+if [[ -d /dev/shm && -w /dev/shm ]]; then
+  STATE="/dev/shm/xenomit_state_$$"
+else
+  STATE="/tmp/xenomit_state_$$"
+fi
+rm -f "$STATE"
+if ! truncate -s 2097152 "$STATE" 2>/dev/null; then
+  dd if=/dev/zero of="$STATE" bs=1048576 count=2 status=none
+fi
+chmod 600 "$STATE"
+export XENOMIT_FLASH_STATE="$STATE"
+export LD_PRELOAD="$HOOK${LD_PRELOAD:+:$LD_PRELOAD}"
+# The setuid sandbox helper is checked before main.js runs. The script also
+# requests --no-sandbox, which is too late for that check inside a container.
+exec "$ELECTRON" --no-sandbox --disable-setuid-sandbox "$ROOT/browser" "$@"

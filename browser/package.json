@@ -1,0 +1,10 @@
+{
+  "name": "xenomit-flash-client-linux",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Linux host for the pinned Pepper Flash plugin",
+  "main": "src/main.js",
+  "dependencies": {
+    "electron": "11.5.0"
+  }
+}
