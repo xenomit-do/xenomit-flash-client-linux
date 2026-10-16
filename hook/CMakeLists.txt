@@ -30,8 +30,8 @@ add_executable(xenomit_flash_sha_test src/sha256.cpp src/sha256_test.cpp)
 target_include_directories(xenomit_flash_sha_test PRIVATE src)
 target_compile_definitions(xenomit_flash_sha_test PRIVATE _GNU_SOURCE)
 
-set(XENOMIT_FLASH_CLIENT "${CMAKE_CURRENT_SOURCE_DIR}/../../xenomit-flash-client")
-if(EXISTS "${XENOMIT_FLASH_CLIENT}/src/swf_bridge.cpp")
+set(XENOMIT_FLASH_CLIENT "" CACHE PATH "Path to xenomit-flash-client checkout")
+if(XENOMIT_FLASH_CLIENT AND EXISTS "${XENOMIT_FLASH_CLIENT}/src/swf_bridge.cpp")
   set(INJECT_OUT "${CMAKE_CURRENT_SOURCE_DIR}/../build")
   add_executable(xenomit_flash_inject
     src/inject_main.cpp
